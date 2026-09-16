@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Orbital Sentinel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/globe.gl"></script>
+</head>
+<body>
+    <!-- 3D Globe Background -->
+    <div id="globe-viz"></div>
+
+    <!-- UI Overlay -->
+    <div class="ui-container">
+
+        <!-- Header -->
+        <header class="header panel">
+            <div class="logo">ORBITAL SENTINEL</div>
+            <div class="header-stats">
+                <span>COORD: <span id="hdr-coord">45.2938, -12.943</span></span>
+                <span>STATUS: <span style="color:#00ffcc">NOMINAL</span></span>
+            </div>
+        </header>
+
+        <!-- Left Column -->
+        <aside class="left-column">
+
+            <!-- Controls -->
+            <div class="panel controls-panel">
+                <h2>SIMULATION CONTROLS</h2>
+                <div class="input-group">
+                    <label>DATA SOURCE</label>
+                    <select id="data-source">
+                        <option value="live">Live CelesTrak (Iridium)</option>
+                        <option value="mock">Mock Generator</option>
+                        <option value="csv">Upload CSV File</option>
+                    </select>
+                </div>
+                <div class="input-group" id="mock-count-group" style="display:none;">
+                    <label>MOCK DEBRIS COUNT</label>
+                    <input type="number" id="num-debris" value="250" min="10" max="1000">
+                </div>
+                <div class="input-group" id="csv-upload-group" style="display:none;">
+                    <label>SELECT CSV FILE</label>
+                    <input type="file" id="csv-file" accept=".csv" style="color:#00ffcc; padding:6px;">
+                    <div style="margin-top:6px;">
+                        <a href="sample_inputs.csv" download style="color:#00ffcc; font-size:12px; text-decoration:none;">⬇ Download Sample CSV</a>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>TIME (HRS)</label>
+                        <input type="number" id="time-window" value="12" min="1" max="48">
+                    </div>
+                    <div class="input-group">
+                        <label>STEP (SEC)</label>
+                        <input type="number" id="step-size" value="10">
+                    </div>
+                </div>
+
+                <!-- Speed Slider -->
+                <div class="input-group" style="margin-top:6px;">
+                    <label>SIM SPEED: <span id="speed-label">500x</span></label>
+                    <input type="range" id="speed-slider" min="50" max="2000" step="50" value="500"
+                        style="width:100%; accent-color:#00ffcc; cursor:pointer;">
+                </div>
+
+                <button id="run-btn" onclick="runSimulation()">INITIALIZE</button>
+            </div>
+
+            <!-- Maneuver Simulator -->
+            <div class="panel controls-panel">
+                <h2>🛸 MANEUVER SIMULATOR</h2>
+                <div class="input-group">
+                    <label>ALTITUDE ADJUST (KM)</label>
+                    <input type="number" id="maneuver-delta" value="0" min="-200" max="200" placeholder="e.g. +15 or -10">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top:4px;">
+                    <button onclick="runManeuver()" style="flex:1; font-size:11px;">TEST WHAT-IF</button>
+                    <button onclick="runAutoEvade()" style="flex:1; font-size:11px; background:rgba(255, 204, 0, 0.1); border-color:#ffcc00; color:#ffcc00;">🤖 AI EVADE</button>
+                </div>
+                <div id="maneuver-result"></div>
+            </div>
+
+            <!-- Risk Table -->
+            <div class="panel table-panel">
+                <h2>CONJUNCTION RISK TABLE
+                    <button onclick="exportCSV()" style="float:right; width:auto; padding:3px 10px; font-size:11px; margin:0; letter-spacing:1px;">⬇ EXPORT</button>
+                </h2>
+                <div class="table-wrapper">
+                    <table id="results-table">
+                        <thead>
+                            <tr>
+                                <th>DEBRIS ID</th>
+                                <th>DIST (KM)</th>
+                                <th>TIME</th>
+                                <th>RISK</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <tr><td colspan="4" style="text-align:center; color:#7b8ea8;">Awaiting telemetry...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Right Column -->
+        <aside class="right-column">
+
+            <!-- Alert Box -->
+            <div class="panel alert-panel safe" id="alert-box">
+                <div class="alert-title">LIVE-TRACKING STATUS</div>
+                <div class="alert-desc">Monitoring orbital shells for conjunction events.</div>
+            </div>
+
+            <!-- Stats -->
+            <div class="panel stats-panel">
+                <div class="stat-block">
+                    <div class="stat-label">TARGET SATELLITE</div>
+                    <div class="stat-value" id="target-id" style="font-size:16px;">---</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-block">
+                        <div class="stat-label">TRACKED DEBRIS</div>
+                        <div class="stat-value" id="metric-debris">0</div>
+                    </div>
+                    <div class="stat-block">
+                        <div class="stat-label">CRITICAL (&lt;10KM)</div>
+                        <div class="stat-value" id="metric-high-risk">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="panel chart-panel">
+                <h2>DISTANCE DISTRIBUTION</h2>
+                <div style="position: relative; height: 180px; width: 100%;">
+                    <canvas id="riskChart"></canvas>
+                </div>
+            </div>
+
+        </aside>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('data-source').addEventListener('change', function() {
+            document.getElementById('mock-count-group').style.display = this.value === 'mock' ? 'block' : 'none';
+            document.getElementById('csv-upload-group').style.display = this.value === 'csv' ? 'block' : 'none';
+        });
+    </script>
+</body>
+</html>

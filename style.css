@@ -1,0 +1,188 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #020408;
+    font-family: 'Rajdhani', sans-serif;
+    color: #e0e5ff;
+}
+
+#globe-viz {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.ui-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none; /* Let clicks pass through to globe by default */
+    display: flex;
+    flex-direction: column;
+}
+
+.panel {
+    pointer-events: auto; /* Re-enable clicks on panels */
+    background: rgba(24, 32, 54, 0.45); 
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(138, 161, 204, 0.25);
+    border-radius: 16px; 
+    box-shadow: 
+        inset 0 1px 1px rgba(255, 255, 255, 0.1),
+        0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Header */
+.header {
+    margin: 20px 30px;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #ffffff;
+}
+
+.header-stats {
+    font-size: 14px;
+    display: flex;
+    gap: 30px;
+    color: #8da1c5;
+}
+
+/* Columns Layout */
+.left-column {
+    position: absolute;
+    left: 30px;
+    top: 100px;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.right-column {
+    position: absolute;
+    right: 30px;
+    top: 100px;
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Panel Styles */
+.panel h2 {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: #a4bce6;
+    border-bottom: 1px solid rgba(80, 120, 200, 0.2);
+    padding-bottom: 8px;
+}
+
+.controls-panel { padding: 20px; }
+.stats-panel { padding: 20px; }
+.table-panel { padding: 20px; flex-grow: 1; max-height: 450px;}
+.chart-panel { padding: 20px; }
+
+/* Forms */
+.input-group { margin-bottom: 12px; }
+.input-row { display: flex; gap: 10px; }
+.input-row .input-group { flex: 1; }
+
+label {
+    display: block;
+    font-size: 12px;
+    color: #7b8ea8;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+}
+
+input, select {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(80, 120, 200, 0.3);
+    color: #00ffcc;
+    padding: 8px 10px;
+    border-radius: 4px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    box-sizing: border-box;
+}
+
+input:focus, select:focus { outline: none; border-color: #00ffcc; }
+
+button {
+    width: 100%;
+    background: rgba(0, 255, 204, 0.1);
+    border: 1px solid #00ffcc;
+    color: #00ffcc;
+    padding: 10px;
+    border-radius: 4px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: rgba(0, 255, 204, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+}
+button:disabled {
+    border-color: #445566; color: #445566; background: transparent;
+}
+
+/* Stats */
+.stat-block { margin-bottom: 15px; }
+.stat-row { display: flex; gap: 20px; }
+.stat-label { font-size: 12px; color: #7b8ea8; letter-spacing: 1px;}
+.stat-value { font-size: 24px; font-weight: 700; color: #ffffff; }
+
+/* Alerts */
+.alert-panel {
+    padding: 15px 20px;
+    border-left: 4px solid #00ffcc;
+}
+.alert-panel.danger {
+    border-left: 4px solid #ff4444;
+    background: rgba(255, 68, 68, 0.1);
+}
+.alert-title { font-size: 14px; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px;}
+.alert-desc { font-size: 12px; color: #a4bce6; }
+
+/* Table */
+.table-wrapper {
+    height: 350px;
+    overflow-y: auto;
+}
+.table-wrapper::-webkit-scrollbar { width: 4px; }
+.table-wrapper::-webkit-scrollbar-thumb { background: rgba(80, 120, 200, 0.5); border-radius: 4px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 8px 4px; color: #7b8ea8; font-weight: 600; position: sticky; top: 0; background: rgba(12, 18, 33, 0.95); z-index: 1;}
+td { padding: 8px 4px; border-bottom: 1px solid rgba(80, 120, 200, 0.1); }
+tr:hover td { background: rgba(255,255,255,0.05); }
+
+.risk-high { color: #ff4444; font-weight: 700; }
+.risk-low { color: #00ffcc; }
