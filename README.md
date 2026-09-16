@@ -32,4 +32,4 @@ The core physics engine (`script.js`) strips away complex perturbations (like J2
 4. **Distance:** Computes the Cartesian distance `Math.sqrt(dx^2 + dy^2 + dz^2)` at every time step to find the absolute minimum approach distance.
 
 ## 🌐 Live Deployment
-This project is fully deployed and accessible at: **[Insert Vercel/Netlify Link Here]**
+This project is fully deployed and accessible at: https://keen-biscotti-14b6bb.netlify.app
